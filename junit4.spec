@@ -30,7 +30,7 @@
 
 Name:           junit4
 Version:        4.5
-Release:        5.3%{?dist}
+Release:        5.4%{?dist}
 Epoch:          0
 Summary:        Java regression test package
 License:        CPL
@@ -44,13 +44,15 @@ Source1:        junit-4.5.pom
 Requires(post): jpackage-utils >= 0:1.7.4
 Requires(postun): jpackage-utils >= 0:1.7.4
 Requires:       hamcrest
-Requires:       java-1.6.0
+Requires:       java >= 1:1.6.0
 BuildRequires:  ant
 BuildRequires:  jpackage-utils >= 0:1.7.4
 BuildRequires:  java-1.6.0-devel
 BuildRequires:  hamcrest
 BuildArch:      noarch
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root
+# Ignore bridge methods when scanning for annotations
+Patch0:         0001-Ignore-bridge-methods.patch
 
 %description
 JUnit is a regression testing framework written by Erich Gamma and Kent Beck. 
@@ -83,6 +85,9 @@ Demonstrations and samples for %{name}.
 
 %prep
 %setup -q -n junit-%{version}
+
+%patch0 -p1
+
 find . -type f -name "*.jar" | xargs -t rm
 ln -s $(build-classpath hamcrest/core) lib/hamcrest-core-1.1.jar
 perl -pi -e 's/\r$//g' stylesheet.css
@@ -148,6 +153,12 @@ rm -rf $RPM_BUILD_ROOT
 %doc junit%{version}/doc/*
 
 %changelog
+* Fri Dec 04 2015 Michael Simacek <msimacek@redhat.com> - 0:4.5-5.4
+- Don't require java 6 specifically
+
+* Thu Oct 22 2015 Michael Simacek <msimacek@redhat.com> - 0:4.5-5.4
+- Fix build with OpenJDK 7
+
 * Thu Jan 7 2010 Alexander Kurtakov <akurtako@redhat.com> 0:4.5-5.3
 - Drop gcj_support.
 
